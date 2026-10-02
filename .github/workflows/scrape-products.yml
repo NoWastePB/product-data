@@ -1,1 +1,73 @@
+```yaml
+name: Scrape retailer products
+
+on:
+  # Handmatig starten vanuit GitHub Actions
+  workflow_dispatch:
+
+  # Dagelijks om 04:00 UTC
+  schedule:
+    - cron: "0 4 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    # Ruim voldoende voor een grote productcatalogus
+    timeout-minutes: 120
+
+    steps:
+
+      # --------------------------------------------------
+      # Repository ophalen
+      # --------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # --------------------------------------------------
+      # Python installeren
+      # --------------------------------------------------
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      # --------------------------------------------------
+      # Dependencies installeren
+      # --------------------------------------------------
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install aiohttp beautifulsoup4 lxml
+
+      # --------------------------------------------------
+      # Scraper uitvoeren
+      # --------------------------------------------------
+      - name: Run retailer scraper
+        run: |
+          python main.py
+
+      # --------------------------------------------------
+      # JSON en CSV bewaren als GitHub Actions artifact
+      # --------------------------------------------------
+      - name: Upload product data
+        uses: actions/upload-artifact@v4
+        with:
+          name: retailer-product-data-${{ github.run_number }}
+          path: |
+            aldi.json
+            aldi.csv
+            jumbo.json
+            jumbo.csv
+            action.json
+            action.csv
+            kruidvat.json
+            kruidvat.csv
+          if-no-files-found: warn
+          retention-days: 30
+```
 
