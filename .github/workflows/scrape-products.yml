@@ -13,7 +13,6 @@ scrape:
 runs-on: ubuntu-latest
 timeout-minutes: 120
 
-```
 steps:
   - name: Checkout repository
     uses: actions/checkout@v4
@@ -48,4 +47,3 @@ steps:
         kruidvat.csv
       if-no-files-found: warn
       retention-days: 30
-```
